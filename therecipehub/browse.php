@@ -214,41 +214,63 @@ session_start();
         }
 
         /* Modal Overlay (Hidden by Default) */
+        .modal-content {
+            background: #d0a772;
+            padding: 30px; /* Increased padding */
+            border-radius: 15px; /* Softer corners */
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 350px; /* Increased width */
+        }
+
         .modal-overlay {
-            position: fixed;
+            display: none; /* Ensure it's hidden initially */
+            position: fixed; /* Para laging nasa ibabaw */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Dim background */
-            display: flex;
-            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 1000; /* Ensure it appears above all other elements */
+            align-items: center;
+            z-index: 9999; /* Siguraduhin na nasa taas ng lahat */
         }
 
-        /* Modal Box */
-        .modal-content {
-            background: #d0a772;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Show Modal */
         .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
+            display: flex;
         }
 
-        /* Fade-In & Fade-Out Effect for Whole Page */
-        body {
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        /* Modal Buttons (Bigger Size) */
+        #confirmLogout, #cancelLogout {
+            padding: 12px 20px; /* Increased padding */
+            font-size: 18px; /* Bigger text */
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        #confirmLogout {
+            background-color: #ffffff;
+            color: #8A6240;
+            border: 2px solid #8A6240;
+        }
+
+        #confirmLogout:hover {
+            background-color: #f5ebe0;
+            transform: scale(1.05);
+        }
+
+        #cancelLogout {
+            background-color: #ffffff;
+            color: #8A6240;
+            border: 2px solid #8A6240;
+        }
+
+        #cancelLogout:hover {
+            background-color: #f5ebe0;
+            transform: scale(1.05);
         }
 
 
@@ -287,7 +309,7 @@ session_start();
             <button id="confirmLogout">Yes</button>
             <button id="cancelLogout">No</button>
         </div>
-
+    </div> 
 </header>
 
 <div class="recipe-title">
