@@ -1,6 +1,6 @@
 <?php
 session_start();
-?>
+?> 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -124,6 +124,44 @@ session_start();
             color: white;
             margin: 0 10px;
         }
+
+        /* Modal Overlay (Hidden by Default) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Dim background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* Modal Box */
+        .modal-content {
+            background: #d0a772;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Show Modal */
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Fade-In & Fade-Out Effect for Whole Page */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
     </style>
 </head>
 <body>
@@ -145,12 +183,20 @@ session_start();
         <div id="userSection">
             <?php if (isset($_SESSION['username'])): ?>
                 <span class="user-info">Hello, <?php echo $_SESSION['username']; ?>!</span>
-                <a href="#" class="logout" onclick="logoutUser()">Logout</a>
+                <a href="#" class="logout" id="logoutBtn">Logout</a>
             <?php else: ?>
                 <a href="login-signup.php" class="logout">Login</a>
             <?php endif; ?>
         </div>
     </div>
+
+        <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <p>Are you sure you want to logout?</p>
+            <button id="confirmLogout">Yes</button>
+            <button id="cancelLogout">No</button>
+        </div>
+</div>
 </header>
 
 <main>
@@ -203,7 +249,49 @@ function logoutUser() {
     })
     .catch(error => console.error('Error:', error));
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.style.opacity = "1"; // Fade in on load
+
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", function(event) {
+            if (this.classList.contains("logout")) {
+                // Show Logout Modal Instead
+                event.preventDefault();
+                document.getElementById("logoutModal").classList.add("show");
+            } else {
+                // Normal Page Transitions
+                event.preventDefault();
+                const href = this.href;
+                document.body.style.opacity = "0"; // Fade-out effect
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 300);
+            }
+        });
+    });
+
+    // Logout Confirmation Buttons
+    document.getElementById("confirmLogout").addEventListener("click", function() {
+        document.body.style.opacity = "0"; // Fade-out effect
+        setTimeout(() => {
+            fetch('logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.location.href = "login-signup.php";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }, 300);
+    });
+
+    document.getElementById("cancelLogout").addEventListener("click", function() {
+        document.getElementById("logoutModal").classList.remove("show");
+    });
+});
 </script>
 
 </body>
 </html>
+
