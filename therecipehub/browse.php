@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 ?>
 
@@ -212,6 +212,46 @@ session_start();
             color: white;
             margin: 0 10px;
         }
+
+        /* Modal Overlay (Hidden by Default) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Dim background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000; /* Ensure it appears above all other elements */
+        }
+
+        /* Modal Box */
+        .modal-content {
+            background: #d0a772;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Show Modal */
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Fade-In & Fade-Out Effect for Whole Page */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+
     </style>
 </head>
 <body>
@@ -233,12 +273,21 @@ session_start();
         <div id="userSection">
             <?php if (isset($_SESSION['username'])): ?>
                 <span class="user-info">Hello, <?php echo $_SESSION['username']; ?>!</span>
-                <a href="#" class="logout" onclick="logoutUser()">Logout</a>
+                <a href="#" class="logout" id="logoutBtn">Logout</a>
             <?php else: ?>
                 <a href="login-signup.php" class="logout">Login</a>
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <p>Are you sure you want to logout?</p>
+            <button id="confirmLogout">Yes</button>
+            <button id="cancelLogout">No</button>
+        </div>
+
 </header>
 
 <div class="recipe-title">
@@ -270,23 +319,75 @@ session_start();
 </footer>
 
 <script>
-        document.addEventListener("DOMContentLoaded", function() {
-        document.body.style.opacity = "1"; // Fade in on load
+    document.addEventListener("DOMContentLoaded", function() {
+    document.body.style.opacity = "1"; // Fade in on load
 
-        document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", function(event) {
-                if (!this.href.includes("logout.php")) { // Avoid logout interfering
-                    event.preventDefault();
-                    const href = this.href;
-                    document.body.classList.add("fade-out"); // Apply fade-out class
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", function(event) {
+            if (!this.href.includes("logout.php")) { // Avoid logout interfering
+                event.preventDefault();
+                const href = this.href;
+                document.body.classList.add("fade-out"); // Apply fade-out class
 
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 50); // Delay for transition
-                }
-            });
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 50); // Delay for transition
+            }
         });
     });
+});
+
+function logoutUser() {
+    fetch('logout.php')
+    .then(response => response.json()) // Convert response to JSON
+    .then(data => {
+        if (data.status === "success") {
+            document.getElementById("userSection").innerHTML = '<a href="login-signup.php" class="logout">Login</a>';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.style.opacity = "1"; // Fade in on load
+
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", function(event) {
+            if (this.classList.contains("logout")) {
+                // Show Logout Modal Instead
+                event.preventDefault();
+                document.getElementById("logoutModal").classList.add("show");
+            } else {
+                // Normal Page Transitions
+                event.preventDefault();
+                const href = this.href;
+                document.body.style.opacity = "0"; // Fade-out effect
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 300);
+            }
+        });
+    });
+
+    // Logout Confirmation Buttons
+    document.getElementById("confirmLogout").addEventListener("click", function() {
+        document.body.style.opacity = "0"; // Fade-out effect
+        setTimeout(() => {
+            fetch('logout.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.location.href = "login-signup.php";
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }, 300);
+    });
+
+    document.getElementById("cancelLogout").addEventListener("click", function() {
+        document.getElementById("logoutModal").classList.remove("show");
+    });
+});
 
         const recipes = {
             all: [
@@ -351,6 +452,7 @@ session_start();
             })
             .catch(error => console.error('Error:', error));
         }
+
     </script>
 
 </body>
